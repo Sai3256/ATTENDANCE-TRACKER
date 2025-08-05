@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Attendance Tracker</title>
+  <link rel="icon" href="attendance.png">
+  <style>
+    :root {
+      --light-bg: #f5f7fa;
+      --light-text: #1a1a1a;
+      --light-card: #ffffff;
+      --light-accent: #1976d2;
+      --light-hover: #1565c0;
+      --dark-bg: #121212;
+      --dark-text: #e0e0e0;
+      --dark-card: #1f1f1f;
+      --dark-accent: #90caf9;
+      --dark-hover: #64b5f6;
+      --danger: #e53935;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--light-text);
+      transition: all 0.3s ease;
+    }
+    body.dark {
+      background-color: var(--dark-bg);
+      color: var(--dark-text);
+    }
+    header {
+      background-color: var(--light-accent);
+      color: white;
+      padding: 1.2rem 2rem;
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      position: relative;
+      transition: background-color 0.3s ease;
+    }
+    body.dark header {
+      background-color: var(--dark-accent);
+    }
+    
+
+    .theme-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      background: transparent;
+      border: none;
+      font-size: 1.7rem;
+      cursor: pointer;
+      color: white;
+    }
+    .auth-buttons {
+      position: absolute;
+      right: 4.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 1.2rem;
+    }
+    .auth-buttons a {
+      background-color: white;
+      color: var(--light-accent);
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: var(--light-card);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease;
+    }
+    body.dark .container {
+      background: var(--dark-card);
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    select, input[type="date"], input[type="month"] {
+      width: 100%;
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    th {
+      background-color: var(--light-accent);
+      color: white;
+      font-weight: 600;
+    }
+    body.dark th {
+      background-color: var(--dark-accent);
+    }
+    .btn {
+      background-color: var(--light-accent);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+    .btn:hover {
+      background-color: var(--light-hover);
+    }
+    body.dark .btn {
+      background-color: var(--dark-accent);
+    }
+    body.dark .btn:hover {
+      background-color: var(--dark-hover);
+    }
+    .danger {
+      color: var(--danger);
+      font-weight: bold;
+    }
+    .center-btn, .top-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      color: black;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: none;
+    }
+    .modal.active {
+      display: block;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    .overlay.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="auth-buttons">
+      <a href="login.html" target="_blank">Login</a>
+      <a href="signup.html" target="_blank">Sign Up</a>
+    </div>
+    Attendance Tracker
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeIcon">🌙</button>
+  </header>
+
+  <div class="container" id="app">
+    <div class="form-group">
+      <label for="subject">Select Subject:</label>
+      <select id="subject"></select>
+    </div>
+    <div class="top-actions">
+      <button class="btn" onclick="addSubject()">Add Subject</button>
+      <button class="btn" onclick="deleteSubject()">Delete Subject</button>
+    </div>
+    <div class="form-group">
+      <label for="date">Select Date:</label>
+      <input type="date" id="date" />
+    </div>
+    <div class="top-actions">
+      <button class="btn" onclick="addStudent()">Add Student</button>
+      <select id="deleteSelect"></select>
+      <button class="btn" onclick="deleteStudent()">Delete Student</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Roll No</th>
+          <th>Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="studentTable"></tbody>
+    </table>
+    <div class="center-btn">
+      <button class="btn" onclick="submitAttendance()">Submit Attendance</button>
+      <button class="btn" onclick="showAttendanceRecord()">View Attendance</button>
+      <input type="month" id="monthInput">
+      <button class="btn" onclick="showGradeBack()">Grade Back</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeModal()"></div>
+  <div class="modal" id="modal">
+    <h3>Grade Back Students</h3>
+    <ul id="gradeBackList"></ul>
+    <button class="btn" onclick="closeModal()">Close</button>
+  </div>
+
+  <script>
+    const subjects = ["Software Engineering", "Advanced COA", "IoT", "FLAT", "Operating Systems", "Data Communication"];
+    let students = [
+      { rollNo: '101', name: 'Aarav Mehta' },
+      { rollNo: '102', name: 'Ishita Nair' },
+      { rollNo: '103', name: 'Kunal Desai' },
+      { rollNo: '104', name: 'Saanvi Sharma' }
+    ];
+    const subjectSelect = document.getElementById("subject");
+    const deleteDropdown = document.getElementById("deleteSelect");
+    const studentTable = document.getElementById("studentTable");
+    const themeIcon = document.getElementById("themeIcon");
+
+    function renderSubjects() {
+      subjectSelect.innerHTML = "";
+      subjects.forEach(sub => {
+        const option = document.createElement("option");
+        option.value = sub;
+        option.textContent = sub;
+        subjectSelect.appendChild(option);
+      });
+    }
+    function renderStudents() {
+      studentTable.innerHTML = "";
+      students.forEach(student => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${student.rollNo}</td>
+          <td>${student.name}</td>
+          <td>
+            <select>
+              <option value="present">Present</option>
+              <option value="absent">Absent</option>
+            </select>
+          </td>
+        `;
+        studentTable.appendChild(row);
+      });
+      renderDeleteOptions();
+    }
+    function renderDeleteOptions() {
+      deleteDropdown.innerHTML = "";
+      students.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.rollNo;
+        opt.textContent = `${s.rollNo} - ${s.name}`;
+        deleteDropdown.appendChild(opt);
+      });
+    }
+    function addStudent() {
+      const roll = prompt("Enter Roll No:");
+      const name = prompt("Enter Name:");
+      if (!roll || !name) return;
+      if (students.some(s => s.rollNo === roll)) return alert("Duplicate Roll No");
+      students.push({ rollNo: roll, name: name });
+      renderStudents();
+    }
+    function deleteStudent() {
+      const roll = deleteDropdown.value;
+      students = students.filter(s => s.rollNo !== roll);
+      renderStudents();
+    }
+    function addSubject() {
+      const sub = prompt("Enter Subject Name:");
+      if (!sub || subjects.includes(sub)) return;
+      subjects.push(sub);
+      renderSubjects();
+    }
+    function deleteSubject() {
+      const sub = subjectSelect.value;
+      if (!sub) return;
+      const index = subjects.indexOf(sub);
+      if (index !== -1) subjects.splice(index, 1);
+      renderSubjects();
+    }
+    function submitAttendance() {
+      const subject = subjectSelect.value;
+      const date = document.getElementById("date").value;
+      if (!subject || !date) return alert("Select both subject and date");
+      const rows = document.querySelectorAll("#studentTable tr");
+      const data = Array.from(rows).map((row, i) => {
+        return {
+          rollNo: students[i].rollNo,
+          status: row.querySelector("select").value
+        };
+      });
+      const key = `${subject}_${date}`;
+      localStorage.setItem(key, JSON.stringify(data));
+      alert("Attendance submitted.");
+    }
+    function showAttendanceRecord() {
+      const subject = subjectSelect.value;
+      const date = document.getElementById("date").value;
+      if (!subject || !date) return alert("Select both subject and date");
+      const key = `${subject}_${date}`;
+      const record = JSON.parse(localStorage.getItem(key));
+      if (!record) return alert("No record found");
+      let list = record.map(s => `${s.rollNo}: ${s.status}`).join("\n");
+      alert(list);
+    }
+    function showGradeBack() {
+      const month = document.getElementById("monthInput").value;
+      const counts = {};
+      const presents = {};
+      for (let key in localStorage) {
+        if (!localStorage.hasOwnProperty(key)) continue;
+        if (!key.includes("_")) continue;
+        const [sub, date] = key.split("_");
+        if (!date.startsWith(month)) continue;
+        const data = JSON.parse(localStorage.getItem(key));
+        data.forEach(entry => {
+          counts[entry.rollNo] = (counts[entry.rollNo] || 0) + 1;
+          if (entry.status === "present")
+            presents[entry.rollNo] = (presents[entry.rollNo] || 0) + 1;
+        });
+      }
+      const result = [];
+      students.forEach(s => {
+        const total = counts[s.rollNo] || 0;
+        const present = presents[s.rollNo] || 0;
+        const percent = total === 0 ? 100 : (present / total) * 100;
+        if (percent < 75) {
+          result.push(`${s.rollNo} - ${s.name} (${percent.toFixed(1)}%)`);
+        }
+      });
+      const list = document.getElementById("gradeBackList");
+      list.innerHTML = "";
+      result.forEach(r => {
+        const li = document.createElement("li");
+        li.textContent = r;
+        list.appendChild(li);
+      });
+      document.getElementById("overlay").classList.add("active");
+      document.getElementById("modal").classList.add("active");
+    }
+    function closeModal() {
+      document.getElementById("overlay").classList.remove("active");
+      document.getElementById("modal").classList.remove("active");
+    }
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      themeIcon.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+    }
+    renderSubjects();
+    renderStudents();
+  </script>
+</body>
+</html>
