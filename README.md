@@ -18,7 +18,7 @@ A modern and responsive Attendance Tracker Web App that allows users to manage s
 
 ## 🌐 Live Demo
 
-👉 [Deployed Link Here](https://your-deployed-link.com)
+👉 [Deployed Link Here](https://sai3256.github.io/ATTENDANCE-TRACKER/)
 
 > Replace the above link with your actual deployed URL once hosted on GitHub Pages, Vercel, Netlify, or any other platform.
 
@@ -30,13 +30,5 @@ A modern and responsive Attendance Tracker Web App that allows users to manage s
    ```bash
    git clone https://github.com/your-username/attendance-tracker.git
    cd attendance-tracker
-attendance-tracker/
-├── index.html         # Main app page
-├── login.html         # Login page
-├── signup.html        # Signup page
-├── style.css          # Styles for the entire app
-├── script.js          # Main JS logic
-├── login.js           # JS for login/signup functionality
-├── assets/            # Images, icons, etc.
-└── README.md          # Project documentation
+
 
